@@ -116,7 +116,7 @@
       <th>TOTAL KEMENANGAN</th>
       <th>NILAI TARUHAN</th>
       <th>SALIN</th>
-      <th>SELISIH</th>
+      <th>CHECK</th>
     </tr>
   </thead>
   <tbody></tbody>
@@ -135,18 +135,12 @@ function prosesData() {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-  if (lines[i+1] && lines[i+1].toLowerCase().includes('pgsoft')) {
-  currentGame = line;
-  }
-
-    if (/^[a-zA-Z0-9_]+$/.test(line) &&
-        !line.toLowerCase().includes('credit') &&
-        !line.toLowerCase().includes('debit') &&
-        !line.toLowerCase().includes('ext') &&
-        !line.toLowerCase().includes('pgsoft')) {
-      currentUser = line;
+    
+    if (lines[i+1] && lines[i+1].toLowerCase().includes('pgsoft')) {
+      currentGame = line;
     }
 
+    
     if (line.includes('Ext. ID')) {
       const match = line.match(/Ext\. ID\s*:\s*([0-9\-]+)/);
       if (match) {
@@ -162,11 +156,18 @@ function prosesData() {
           };
         }
 
+        
+        let possibleUser = lines[i+1] || '';
+        if (/^[a-zA-Z0-9_]+$/.test(possibleUser)) {
+          currentUser = possibleUser;
+        }
+
         grouped[currentPeriode].user = currentUser;
         grouped[currentPeriode].game = currentGame;
       }
     }
 
+    
     if (line.startsWith('Credit')) {
       const nextLine = lines[i + 1] || '';
       const amount = parseInt(nextLine.replace(/[^\d]/g, ''), 10);
@@ -175,6 +176,7 @@ function prosesData() {
       }
     }
 
+    
     if (line.startsWith('Debit')) {
       const nextLine = lines[i + 1] || '';
       const amount = parseInt(nextLine.replace(/[^\d]/g, ''), 10);
