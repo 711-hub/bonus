@@ -135,10 +135,10 @@ function prosesData() {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Tangkap nama game
-    if (line.toLowerCase().includes('mahjong ways')) currentGame = line;
+  if (lines[i+1] && lines[i+1].toLowerCase().includes('pgsoft')) {
+  currentGame = line;
+  }
 
-    // Tangkap USER ID (hanya baris huruf/angka, bukan Credit/Debit/Ext.)
     if (/^[a-zA-Z0-9_]+$/.test(line) &&
         !line.toLowerCase().includes('credit') &&
         !line.toLowerCase().includes('debit') &&
@@ -147,14 +147,12 @@ function prosesData() {
       currentUser = line;
     }
 
-    // Tangkap Ext. ID dan periode
     if (line.includes('Ext. ID')) {
       const match = line.match(/Ext\. ID\s*:\s*([0-9\-]+)/);
       if (match) {
         const parts = match[1].split('-');
         currentPeriode = parts[1];
 
-        // Inisialisasi jika belum ada
         if (!grouped[currentPeriode]) {
           grouped[currentPeriode] = {
             user: '',
@@ -164,13 +162,11 @@ function prosesData() {
           };
         }
 
-        // Pastikan selalu update user & game (meskipun sudah ada)
         grouped[currentPeriode].user = currentUser;
         grouped[currentPeriode].game = currentGame;
       }
     }
 
-    // Credit
     if (line.startsWith('Credit')) {
       const nextLine = lines[i + 1] || '';
       const amount = parseInt(nextLine.replace(/[^\d]/g, ''), 10);
@@ -179,7 +175,6 @@ function prosesData() {
       }
     }
 
-    // Debit
     if (line.startsWith('Debit')) {
       const nextLine = lines[i + 1] || '';
       const amount = parseInt(nextLine.replace(/[^\d]/g, ''), 10);
@@ -189,7 +184,6 @@ function prosesData() {
     }
   }
 
-  // Tampilkan hasil
   const table = document.getElementById('resultTable');
   const tbody = table.querySelector('tbody');
   tbody.innerHTML = '';
@@ -211,7 +205,6 @@ function prosesData() {
 
     row.innerHTML = rowData.map(col => `<td>${col}</td>`).join('');
 
-    // Tombol salin
     const salinTd = document.createElement('td');
     const salinBtn = document.createElement('button');
     salinBtn.textContent = 'Salin';
@@ -221,7 +214,6 @@ function prosesData() {
     salinTd.appendChild(salinBtn);
     row.appendChild(salinTd);
 
-    // Kolom selisih
     const selisihTd = document.createElement('td');
     selisihTd.textContent = selisih.toString();
     row.appendChild(selisihTd);
